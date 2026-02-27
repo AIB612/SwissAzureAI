@@ -4,115 +4,73 @@
 
 ---
 
-## 📋 Prerequisites
+## 🚀 Official Microsoft Open Source Projects
 
-- Azure Subscription with Switzerland North access
-- Azure OpenAI Service approved
-- Azure CLI installed
+### Primary: azure-search-openai-demo
 
----
-
-## 🏗️ Architecture
-
-```
-User Query
-    │
-    ▼
-┌─────────────────┐
-│  Azure App      │
-│  Service        │
-└────────┬────────┘
-         │
-    ┌────┴────┐
-    ▼         ▼
-┌───────┐  ┌───────────┐
-│Azure  │  │Azure AI   │
-│OpenAI │  │Search     │
-└───────┘  └─────┬─────┘
-                 │
-                 ▼
-          ┌───────────┐
-          │Azure Blob │
-          │Storage    │
-          └───────────┘
-```
-
----
-
-## 🚀 Quick Start
-
-### 1. Clone Azure Sample
+**GitHub:** https://github.com/Azure-Samples/azure-search-openai-demo
 
 ```bash
+# Clone
 git clone https://github.com/Azure-Samples/azure-search-openai-demo
 cd azure-search-openai-demo
-```
 
-### 2. Configure for Switzerland North
-
-```bash
-# Set environment
+# Deploy to Switzerland North
+azd auth login
 azd env new swiss-rag-prod
-
-# Configure region
 azd env set AZURE_LOCATION switzerlandnorth
 azd env set AZURE_OPENAI_LOCATION switzerlandnorth
-```
-
-### 3. Deploy
-
-```bash
-azd auth login
 azd up
 ```
 
----
-
-## 📁 Files
-
-| File | Description |
-|------|-------------|
-| [infra/](./infra/) | Bicep/Terraform templates |
-| [app/](./app/) | Python application code |
-| [data/](./data/) | Sample documents |
+**Features:**
+- ✅ Chat interface with citations
+- ✅ Document ingestion (PDF, DOCX, etc.)
+- ✅ Azure AI Search integration
+- ✅ Azure OpenAI GPT-4
+- ✅ Python backend
 
 ---
 
-## ⚙️ Configuration
+## 📦 Other Azure RAG Samples
 
-### Environment Variables
+| Project | Language | Link |
+|---------|----------|------|
+| azure-search-openai-demo | Python | [GitHub](https://github.com/Azure-Samples/azure-search-openai-demo) |
+| azure-search-openai-demo-java | Java | [GitHub](https://github.com/Azure-Samples/azure-search-openai-demo-java) |
+| azure-search-openai-demo-csharp | C# | [GitHub](https://github.com/Azure-Samples/azure-search-openai-demo-csharp) |
+| azure-search-openai-javascript | JavaScript | [GitHub](https://github.com/Azure-Samples/azure-search-openai-javascript) |
+| chat-with-your-data-solution-accelerator | Python | [GitHub](https://github.com/Azure-Samples/chat-with-your-data-solution-accelerator) |
 
-```env
-AZURE_LOCATION=switzerlandnorth
-AZURE_OPENAI_SERVICE=your-openai-service
-AZURE_OPENAI_DEPLOYMENT=gpt-4
-AZURE_SEARCH_SERVICE=your-search-service
-AZURE_SEARCH_INDEX=your-index
-AZURE_STORAGE_ACCOUNT=your-storage
+---
+
+## ⚙️ Switzerland North Configuration
+
+```bash
+# Required environment variables
+export AZURE_LOCATION=switzerlandnorth
+export AZURE_OPENAI_LOCATION=switzerlandnorth
+export AZURE_OPENAI_RESOURCE_GROUP=rg-swiss-rag
+export AZURE_OPENAI_SERVICE=oai-swiss-rag
+export AZURE_SEARCH_SERVICE=search-swiss-rag
 ```
 
-### Switzerland North Available Models
+### Available Services in Switzerland North
 
-| Model | Availability |
-|-------|--------------|
-| gpt-4 | ✅ Available |
-| gpt-4-turbo | ✅ Available |
-| gpt-35-turbo | ✅ Available |
-| text-embedding-ada-002 | ✅ Available |
-
----
-
-## 🔒 Security Best Practices
-
-1. **Private Endpoints** - No public internet exposure
-2. **Managed Identity** - No credentials in code
-3. **Key Vault** - Secrets management
-4. **Network Isolation** - VNet integration
+| Service | Status |
+|---------|--------|
+| Azure OpenAI | ✅ Available |
+| Azure AI Search | ✅ Available |
+| Azure Blob Storage | ✅ Available |
+| Azure PostgreSQL | ✅ Available |
+| Azure App Service | ✅ Available |
+| Azure Container Apps | ✅ Available |
 
 ---
 
-## 📚 References
+## 📚 Documentation
 
-- [Azure OpenAI Switzerland North](https://azure.microsoft.com/en-us/explore/global-infrastructure/products-by-region/)
-- [Azure Search OpenAI Demo](https://github.com/Azure-Samples/azure-search-openai-demo)
+- [Azure OpenAI Documentation](https://learn.microsoft.com/en-us/azure/ai-services/openai/)
+- [Azure AI Search Documentation](https://learn.microsoft.com/en-us/azure/search/)
+- [RAG Pattern Guide](https://learn.microsoft.com/en-us/azure/search/retrieval-augmented-generation-overview)
 - [Azure OpenAI Landing Zone](https://learn.microsoft.com/en-us/azure/architecture/ai-ml/architecture/azure-openai-baseline-landing-zone)

@@ -1,220 +1,172 @@
 # 🏛️ Reference Architecture
 
-> Enterprise AI Architecture Patterns for Swiss Compliance
+> Enterprise AI Architecture - Open Source References
 
 ---
 
-## 🎯 Architecture Decision Matrix
+## 📚 Official Architecture References
 
-| Requirement | Azure Native | Private (pgvector) | Hybrid |
-|-------------|--------------|-------------------|--------|
-| Data Residency | ✅ Switzerland North | ✅ On-premises | ✅ Both |
-| FADP Compliance | ✅ | ✅ | ✅ |
-| FINMA Banking | ⚠️ Review needed | ✅ Full control | ✅ |
-| Cost | 💰💰💰 | 💰💰 | 💰💰💰 |
-| Scalability | ✅ Auto-scale | ⚠️ Manual | ✅ |
-| Maintenance | ✅ Managed | ⚠️ Self-managed | ⚠️ |
+### Microsoft Azure
+
+| Resource | Link |
+|----------|------|
+| **Azure OpenAI Landing Zone** | https://learn.microsoft.com/en-us/azure/architecture/ai-ml/architecture/azure-openai-baseline-landing-zone |
+| **RAG Pattern Guide** | https://learn.microsoft.com/en-us/azure/search/retrieval-augmented-generation-overview |
+| **Azure Well-Architected** | https://learn.microsoft.com/en-us/azure/well-architected/ |
+| **AI Architecture Center** | https://learn.microsoft.com/en-us/azure/architecture/ai-ml/ |
+
+### Open Source RAG Architectures
+
+| Project | Architecture Docs |
+|---------|-------------------|
+| **RAGFlow** | https://ragflow.io/docs/dev/ |
+| **Dify** | https://docs.dify.ai/getting-started/readme |
+| **LangChain** | https://python.langchain.com/docs/tutorials/rag/ |
+| **LlamaIndex** | https://docs.llamaindex.ai/en/stable/ |
 
 ---
 
 ## 🏗️ Architecture Patterns
 
-### Pattern 1: Azure Native RAG
+### Pattern 1: Azure Native
 
-Best for: General enterprise, non-banking
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    Azure Switzerland North                       │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │                    Virtual Network                        │   │
-│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐      │   │
-│  │  │ App Service │  │ Azure OpenAI│  │ AI Search   │      │   │
-│  │  │ (Frontend)  │  │ (Private EP)│  │ (Private EP)│      │   │
-│  │  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘      │   │
-│  │         │                │                │              │   │
-│  │         └────────────────┼────────────────┘              │   │
-│  │                          │                               │   │
-│  │  ┌─────────────┐  ┌──────┴──────┐  ┌─────────────┐      │   │
-│  │  │ Key Vault   │  │ PostgreSQL  │  │ Blob Storage│      │   │
-│  │  │ (Secrets)   │  │ (pgvector)  │  │ (Documents) │      │   │
-│  │  └─────────────┘  └─────────────┘  └─────────────┘      │   │
-│  └──────────────────────────────────────────────────────────┘   │
-│                                                                  │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │                    Monitoring                             │   │
-│  │  Log Analytics  │  Application Insights  │  Alerts       │   │
-│  └──────────────────────────────────────────────────────────┘   │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-### Pattern 2: Private Deployment
-
-Best for: Banking, highly regulated industries
+**Reference:** https://github.com/Azure-Samples/azure-search-openai-demo
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                    Swiss Data Center                             │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │                    Kubernetes Cluster                     │   │
-│  │                                                           │   │
-│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐      │   │
-│  │  │   Nginx     │  │   FastAPI   │  │   Ollama    │      │   │
-│  │  │  Ingress    │──│   (RAG)     │──│   (LLM)     │      │   │
-│  │  └─────────────┘  └──────┬──────┘  └─────────────┘      │   │
-│  │                          │                               │   │
-│  │  ┌─────────────┐  ┌──────┴──────┐  ┌─────────────┐      │   │
-│  │  │  Vault      │  │ PostgreSQL  │  │   MinIO     │      │   │
-│  │  │ (Secrets)   │  │ (pgvector)  │  │ (Storage)   │      │   │
-│  │  └─────────────┘  └─────────────┘  └─────────────┘      │   │
-│  │                                                           │   │
-│  └──────────────────────────────────────────────────────────┘   │
-│                                                                  │
-│  ┌──────────────────────────────────────────────────────────┐   │
-│  │                    Monitoring                             │   │
-│  │  Prometheus  │  Grafana  │  ELK Stack                    │   │
-│  └──────────────────────────────────────────────────────────┘   │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                 Azure Switzerland North                      │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│   User ──► App Service ──► Azure OpenAI                     │
+│                │                                             │
+│                ▼                                             │
+│         Azure AI Search ◄── Azure Blob Storage              │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-### Pattern 3: Hybrid (Recommended for Banking)
+**Deploy:**
+```bash
+git clone https://github.com/Azure-Samples/azure-search-openai-demo
+cd azure-search-openai-demo
+azd env set AZURE_LOCATION switzerlandnorth
+azd up
+```
 
-Best for: Banks needing Azure services but strict data control
+### Pattern 2: Self-hosted (RAGFlow)
+
+**Reference:** https://github.com/infiniflow/ragflow
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                                                                  │
-│  ┌─────────────────────────┐    ┌─────────────────────────┐    │
-│  │   Azure Switzerland     │    │   On-Premises / Swiss   │    │
-│  │        North            │    │      Data Center        │    │
-│  │                         │    │                         │    │
-│  │  ┌─────────────────┐   │    │  ┌─────────────────┐   │    │
-│  │  │  Azure OpenAI   │   │    │  │  Customer Data  │   │    │
-│  │  │  (No customer   │◄──┼────┼──│  (PostgreSQL    │   │    │
-│  │  │   data stored)  │   │    │  │   + pgvector)   │   │    │
-│  │  └─────────────────┘   │    │  └─────────────────┘   │    │
-│  │                         │    │                         │    │
-│  │  ┌─────────────────┐   │    │  ┌─────────────────┐   │    │
-│  │  │  App Service    │   │    │  │  Document       │   │    │
-│  │  │  (Stateless)    │◄──┼────┼──│  Storage        │   │    │
-│  │  └─────────────────┘   │    │  └─────────────────┘   │    │
-│  │                         │    │                         │    │
-│  └─────────────────────────┘    └─────────────────────────┘    │
-│                                                                  │
-│              ExpressRoute / VPN (Encrypted)                      │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                    Docker Compose                            │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│   User ──► Nginx ──► RAGFlow API ──► Ollama (LLM)          │
+│                          │                                   │
+│                          ▼                                   │
+│                    Elasticsearch ◄── MinIO                  │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Deploy:**
+```bash
+git clone https://github.com/infiniflow/ragflow
+cd ragflow/docker
+docker compose up -d
+```
+
+### Pattern 3: pgvector + FastAPI
+
+**Reference:** https://github.com/pgvector/pgvector
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Kubernetes / Docker                       │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│   User ──► FastAPI ──► Ollama (LLM)                        │
+│                │                                             │
+│                ▼                                             │
+│         PostgreSQL + pgvector ◄── S3/MinIO                 │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Deploy:**
+```bash
+# docker-compose.yml
+docker compose up -d
 ```
 
 ---
 
-## 🔐 Security Layers
+## 🔗 Open Source Architecture Tools
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│ Layer 1: Network Security                                        │
-│ - Private Endpoints (no public internet)                         │
-│ - Network Security Groups                                        │
-│ - Azure Firewall / WAF                                          │
-├─────────────────────────────────────────────────────────────────┤
-│ Layer 2: Identity & Access                                       │
-│ - Microsoft Entra ID (Azure AD)                                 │
-│ - Managed Identities                                            │
-│ - RBAC (Role-Based Access Control)                              │
-├─────────────────────────────────────────────────────────────────┤
-│ Layer 3: Data Protection                                         │
-│ - Encryption at rest (AES-256)                                  │
-│ - Encryption in transit (TLS 1.3)                               │
-│ - Customer-managed keys (Key Vault)                             │
-├─────────────────────────────────────────────────────────────────┤
-│ Layer 4: Application Security                                    │
-│ - Input validation                                              │
-│ - Output sanitization                                           │
-│ - Rate limiting                                                 │
-├─────────────────────────────────────────────────────────────────┤
-│ Layer 5: Monitoring & Audit                                      │
-│ - Azure Monitor / Log Analytics                                 │
-│ - Security Center / Defender                                    │
-│ - Audit logs (90+ days retention)                               │
-└─────────────────────────────────────────────────────────────────┘
+| Tool | GitHub | Description |
+|------|--------|-------------|
+| **Diagrams** | https://github.com/mingrammer/diagrams | Architecture as code |
+| **Structurizr** | https://github.com/structurizr/dsl | C4 model diagrams |
+| **Mermaid** | https://github.com/mermaid-js/mermaid | Markdown diagrams |
+| **Draw.io** | https://github.com/jgraph/drawio | Diagram editor |
+
+### Diagrams as Code Example
+
+```python
+# pip install diagrams
+from diagrams import Diagram
+from diagrams.azure.compute import AppServices
+from diagrams.azure.database import DatabaseForPostgresqlServers
+from diagrams.azure.ai import CognitiveServices
+
+with Diagram("Swiss RAG Architecture", show=False):
+    user = AppServices("App Service")
+    openai = CognitiveServices("Azure OpenAI")
+    db = DatabaseForPostgresqlServers("PostgreSQL")
+    
+    user >> openai >> db
 ```
 
 ---
 
-## 📊 Cost Estimation (Monthly)
+## 📊 Comparison Matrix
 
-### Azure Native (Small)
-
-| Service | SKU | Cost (CHF) |
-|---------|-----|------------|
-| Azure OpenAI | S0 + usage | ~500-2000 |
-| AI Search | Standard | ~250 |
-| PostgreSQL | GP_D2s_v3 | ~200 |
-| App Service | P1v3 | ~150 |
-| Storage | 100GB | ~5 |
-| Key Vault | Standard | ~5 |
-| **Total** | | **~1100-2600** |
-
-### Private Deployment (Small)
-
-| Component | Spec | Cost (CHF) |
-|-----------|------|------------|
-| Server (GPU) | RTX 4090 | ~300 (hosting) |
-| Storage | 1TB NVMe | ~50 |
-| Bandwidth | 1Gbps | ~100 |
-| Backup | 500GB | ~30 |
-| **Total** | | **~480** |
+| Feature | Azure Native | RAGFlow | pgvector |
+|---------|--------------|---------|----------|
+| Setup | `azd up` | `docker compose` | Manual |
+| Data Residency | Switzerland North | Self-hosted | Self-hosted |
+| Cost | Pay-as-you-go | Infrastructure only | Infrastructure only |
+| Scalability | Auto | Manual | Manual |
+| Maintenance | Managed | Self | Self |
+| FINMA Ready | Review needed | ✅ Full control | ✅ Full control |
 
 ---
 
-## 📋 Implementation Checklist
+## 📚 Learning Resources
 
-```
-Phase 1: Foundation (Week 1-2)
-□ Azure subscription setup
-□ Resource group creation
-□ Network architecture (VNet, subnets)
-□ Key Vault deployment
-□ Managed identities
+### Courses
 
-Phase 2: Core Services (Week 3-4)
-□ Azure OpenAI deployment
-□ AI Search setup
-□ PostgreSQL + pgvector
-□ Storage account
-□ Private endpoints
+| Course | Platform | Link |
+|--------|----------|------|
+| RAG with LangChain | DeepLearning.AI | https://www.deeplearning.ai/short-courses/ |
+| Azure AI Fundamentals | Microsoft Learn | https://learn.microsoft.com/en-us/training/paths/get-started-with-artificial-intelligence-on-azure/ |
+| Vector Databases | Pinecone | https://www.pinecone.io/learn/ |
 
-Phase 3: Application (Week 5-6)
-□ RAG application deployment
-□ Document ingestion pipeline
-□ API development
-□ Frontend deployment
+### Books
 
-Phase 4: Security & Compliance (Week 7-8)
-□ Security hardening
-□ FADP compliance review
-□ Penetration testing
-□ Documentation
-□ SOC2 evidence collection
-
-Phase 5: Operations (Ongoing)
-□ Monitoring setup
-□ Alerting configuration
-□ Backup verification
-□ Disaster recovery testing
-□ Performance optimization
-```
+| Title | Link |
+|-------|------|
+| Building LLM Apps | https://www.oreilly.com/library/view/building-llm-apps/9781835462317/ |
+| Designing Data-Intensive Applications | https://dataintensive.net/ |
 
 ---
 
-## 📚 References
+## 🔗 Community
 
-- [Azure OpenAI Landing Zone](https://learn.microsoft.com/en-us/azure/architecture/ai-ml/architecture/azure-openai-baseline-landing-zone)
-- [Azure Well-Architected Framework](https://learn.microsoft.com/en-us/azure/well-architected/)
-- [Swiss Financial Market Supervisory Authority](https://www.finma.ch)
+| Community | Link |
+|-----------|------|
+| RAGFlow Discord | https://discord.gg/NjYzJD3GM3 |
+| Dify Discord | https://discord.gg/FngNHpbcY7 |
+| LangChain Discord | https://discord.gg/langchain |
+| Azure AI Community | https://techcommunity.microsoft.com/t5/azure-ai/ct-p/AzureAI |

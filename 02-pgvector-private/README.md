@@ -4,244 +4,213 @@
 
 ---
 
-## 🎯 Why Private Deployment?
+## 🚀 Open Source Projects
 
-| Concern | Solution |
-|---------|----------|
-| Data leaves Switzerland | ❌ Never with private deployment |
-| Vendor lock-in | ✅ Open source stack |
-| Cost control | ✅ Predictable infrastructure costs |
-| Full audit trail | ✅ Complete control |
+### Core: pgvector
+
+**GitHub:** https://github.com/pgvector/pgvector
+
+```bash
+# Docker (easiest)
+docker run -d --name pgvector \
+  -e POSTGRES_PASSWORD=mysecret \
+  -p 5432:5432 \
+  pgvector/pgvector:pg16
+```
+
+### RAG Platforms (Self-hosted)
+
+| Project | GitHub | Quick Start |
+|---------|--------|-------------|
+| **RAGFlow** | https://github.com/infiniflow/ragflow | `docker compose up -d` |
+| **Dify** | https://github.com/langgenius/dify | `docker compose up -d` |
+| **PrivateGPT** | https://github.com/zylon-ai/private-gpt | `poetry install && make run` |
+| **Quivr** | https://github.com/QuivrHQ/quivr | `docker compose up` |
+| **AnythingLLM** | https://github.com/Mintplex-Labs/anything-llm | Desktop app |
 
 ---
 
-## 🏗️ Architecture
+## 🔥 RAGFlow (Recommended)
 
+**GitHub:** https://github.com/infiniflow/ragflow
+
+```bash
+# Clone
+git clone https://github.com/infiniflow/ragflow.git
+cd ragflow/docker
+
+# Set vm.max_map_count (required)
+sudo sysctl -w vm.max_map_count=262144
+
+# Start
+docker compose up -d
+
+# Access: http://localhost:80
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    Private Infrastructure                    │
-├─────────────────────────────────────────────────────────────┤
-│                                                              │
-│  ┌──────────┐   ┌──────────────┐   ┌──────────────┐        │
-│  │  Ollama  │   │  PostgreSQL  │   │    MinIO     │        │
-│  │  (LLM)   │   │  + pgvector  │   │  (Storage)   │        │
-│  └────┬─────┘   └──────┬───────┘   └──────┬───────┘        │
-│       │                │                   │                │
-│       └────────────────┼───────────────────┘                │
-│                        ▼                                    │
-│               ┌────────────────┐                            │
-│               │    FastAPI     │                            │
-│               │   Application  │                            │
-│               └────────────────┘                            │
-│                        │                                    │
-│                        ▼                                    │
-│               ┌────────────────┐                            │
-│               │     Nginx      │                            │
-│               │   (Reverse)    │                            │
-│               └────────────────┘                            │
-│                                                              │
-└─────────────────────────────────────────────────────────────┘
-```
+
+**Features:**
+- ✅ Deep document understanding (PDF, DOCX, images)
+- ✅ Multiple chunking strategies
+- ✅ Built-in vector database
+- ✅ Agent capabilities
+- ✅ API access
 
 ---
 
-## 🚀 Quick Start
+## 🎨 Dify (Low-code)
 
-### 1. Docker Compose Setup
+**GitHub:** https://github.com/langgenius/dify
 
-```yaml
-# docker-compose.yml
-version: '3.8'
+```bash
+# Clone
+git clone https://github.com/langgenius/dify.git
+cd dify/docker
 
-services:
-  postgres:
-    image: pgvector/pgvector:pg16
-    environment:
-      POSTGRES_DB: ragdb
-      POSTGRES_USER: raguser
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+# Configure
+cp .env.example .env
 
-  ollama:
-    image: ollama/ollama:latest
-    volumes:
-      - ollama:/root/.ollama
-    ports:
-      - "11434:11434"
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+# Start
+docker compose up -d
 
-  app:
-    build: ./app
-    environment:
-      DATABASE_URL: postgresql://raguser:${DB_PASSWORD}@postgres:5432/ragdb
-      OLLAMA_HOST: http://ollama:11434
-    ports:
-      - "8000:8000"
-    depends_on:
-      - postgres
-      - ollama
-
-  minio:
-    image: minio/minio
-    command: server /data --console-address ":9001"
-    environment:
-      MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD}
-    volumes:
-      - minio:/data
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-
-volumes:
-  pgdata:
-  ollama:
-  minio:
+# Access: http://localhost/install
 ```
 
-### 2. Initialize pgvector
+**Features:**
+- ✅ Visual workflow builder
+- ✅ RAG pipeline
+- ✅ 100+ model integrations
+- ✅ API & SDK
+
+---
+
+## 🔒 PrivateGPT (100% Offline)
+
+**GitHub:** https://github.com/zylon-ai/private-gpt
+
+```bash
+# Clone
+git clone https://github.com/zylon-ai/private-gpt.git
+cd private-gpt
+
+# Install
+poetry install --extras "ui llms-llama-cpp embeddings-huggingface vector-stores-qdrant"
+
+# Download models
+poetry run python scripts/setup
+
+# Run
+make run
+
+# Access: http://localhost:8001
+```
+
+**Features:**
+- ✅ 100% offline capable
+- ✅ No data leaves your machine
+- ✅ Local LLM (Llama, Mistral)
+- ✅ Local embeddings
+
+---
+
+## 🐘 pgvector Direct Usage
+
+### Installation
 
 ```sql
 -- Enable extension
-CREATE EXTENSION IF NOT EXISTS vector;
+CREATE EXTENSION vector;
 
--- Create documents table
+-- Create table
 CREATE TABLE documents (
     id SERIAL PRIMARY KEY,
-    content TEXT NOT NULL,
+    content TEXT,
     metadata JSONB,
-    embedding vector(384),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    embedding vector(384)
 );
 
--- Create index for similarity search
+-- Create index
 CREATE INDEX ON documents 
 USING ivfflat (embedding vector_cosine_ops)
 WITH (lists = 100);
 ```
 
-### 3. Python RAG Application
+### Python Client
+
+**GitHub:** https://github.com/pgvector/pgvector-python
+
+```bash
+pip install pgvector psycopg2-binary sentence-transformers
+```
 
 ```python
-# app/main.py
-from fastapi import FastAPI
-from sentence_transformers import SentenceTransformer
 import psycopg2
-import ollama
+from pgvector.psycopg2 import register_vector
+from sentence_transformers import SentenceTransformer
 
-app = FastAPI(title="Swiss Private RAG")
+# Connect
+conn = psycopg2.connect("postgresql://user:pass@localhost/ragdb")
+register_vector(conn)
+cur = conn.cursor()
 
 # Load embedding model
-embedder = SentenceTransformer('BAAI/bge-small-en-v1.5')
+model = SentenceTransformer('BAAI/bge-small-en-v1.5')
 
-@app.post("/index")
-async def index_document(content: str, metadata: dict = None):
-    """Index a document"""
-    embedding = embedder.encode(content).tolist()
-    
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute(
-        "INSERT INTO documents (content, metadata, embedding) VALUES (%s, %s, %s)",
-        (content, metadata, embedding)
-    )
-    conn.commit()
-    return {"status": "indexed"}
+# Index document
+text = "Company policy: Annual leave is 25 days."
+embedding = model.encode(text).tolist()
+cur.execute(
+    "INSERT INTO documents (content, embedding) VALUES (%s, %s)",
+    (text, embedding)
+)
+conn.commit()
 
-@app.post("/query")
-async def query(question: str, top_k: int = 3):
-    """RAG query"""
-    # 1. Embed question
-    query_embedding = embedder.encode(question).tolist()
-    
-    # 2. Search similar documents
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT content, 1 - (embedding <=> %s::vector) as similarity
-        FROM documents
-        ORDER BY embedding <=> %s::vector
-        LIMIT %s
-    """, (query_embedding, query_embedding, top_k))
-    
-    results = cur.fetchall()
-    context = "\n\n".join([r[0] for r in results])
-    
-    # 3. Generate answer with Ollama
-    response = ollama.chat(
-        model='llama3',
-        messages=[{
-            'role': 'user',
-            'content': f"Context:\n{context}\n\nQuestion: {question}\n\nAnswer:"
-        }]
-    )
-    
-    return {
-        "answer": response['message']['content'],
-        "sources": [{"content": r[0], "score": r[1]} for r in results]
-    }
+# Search
+query = "How many vacation days?"
+query_embedding = model.encode(query).tolist()
+cur.execute("""
+    SELECT content, 1 - (embedding <=> %s::vector) as similarity
+    FROM documents
+    ORDER BY embedding <=> %s::vector
+    LIMIT 5
+""", (query_embedding, query_embedding))
+
+for row in cur.fetchall():
+    print(f"{row[1]:.3f}: {row[0]}")
 ```
 
 ---
 
-## 🔧 Embedding Models (Local)
+## 🏠 Local LLM Options
 
-| Model | Size | Language |
-|-------|------|----------|
-| BAAI/bge-small-en-v1.5 | 130MB | English |
-| BAAI/bge-m3 | 2.3GB | Multilingual |
-| sentence-transformers/all-MiniLM-L6-v2 | 90MB | English |
+| Project | GitHub | Description |
+|---------|--------|-------------|
+| **Ollama** | https://github.com/ollama/ollama | Easiest local LLM |
+| **vLLM** | https://github.com/vllm-project/vllm | High-performance inference |
+| **llama.cpp** | https://github.com/ggerganov/llama.cpp | CPU inference |
+| **LocalAI** | https://github.com/mudler/LocalAI | OpenAI-compatible API |
 
----
+### Ollama Quick Start
 
-## 🔒 Security Hardening
+```bash
+# Install
+curl -fsSL https://ollama.com/install.sh | sh
 
-```yaml
-# docker-compose.override.yml (production)
-services:
-  postgres:
-    networks:
-      - internal
-    # No external ports exposed
-    
-  app:
-    networks:
-      - internal
-      - external
-    environment:
-      - SSL_CERT_FILE=/certs/server.crt
-      
-networks:
-  internal:
-    internal: true
-  external:
+# Run model
+ollama run llama3
+
+# API
+curl http://localhost:11434/api/generate -d '{
+  "model": "llama3",
+  "prompt": "Hello!"
+}'
 ```
 
 ---
 
-## 📊 Performance Tuning
-
-```sql
--- PostgreSQL tuning for vector search
-ALTER SYSTEM SET shared_buffers = '4GB';
-ALTER SYSTEM SET effective_cache_size = '12GB';
-ALTER SYSTEM SET maintenance_work_mem = '2GB';
-ALTER SYSTEM SET max_parallel_workers_per_gather = 4;
-```
-
----
-
-## 📚 References
+## 📚 Documentation
 
 - [pgvector GitHub](https://github.com/pgvector/pgvector)
-- [Ollama](https://ollama.ai)
-- [Sentence Transformers](https://www.sbert.net)
+- [RAGFlow Docs](https://ragflow.io/docs/dev/)
+- [Dify Docs](https://docs.dify.ai/)
+- [PrivateGPT Docs](https://docs.privategpt.dev/)
+- [Ollama Docs](https://ollama.com/)
