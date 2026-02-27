@@ -1,287 +1,600 @@
 # 🏢 Microsoft 数字化转型完整方案
 
-> 从数据采集 → AI 分析 → 自动化 → 展示的完整闭环
+> 云基础设施 + 自动化运维 + 协作通信 + AI 的完整能力矩阵
 
 ---
 
-## 🔄 业务闭环架构
+## 🎯 能力矩阵总览
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                        数字化转型闭环                            │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│   📥 数据采集          📊 存储分析          🤖 AI 处理           │
-│   ─────────────       ─────────────       ─────────────         │
-│   Power Apps          Dataverse           Azure OpenAI          │
-│   Forms               SharePoint          Semantic Kernel       │
-│   Excel               SQL/Fabric          Copilot Studio        │
-│        │                   │                    │                │
-│        └───────────────────┼────────────────────┘                │
-│                            ▼                                     │
-│                    ⚡ Power Automate                             │
-│                    (流程自动化中枢)                               │
-│                            │                                     │
-│        ┌───────────────────┼───────────────────┐                │
-│        ▼                   ▼                   ▼                │
-│   📧 通知推送         📈 报表展示         🔄 系统集成            │
-│   ─────────────       ─────────────       ─────────────         │
-│   Teams/Outlook       Power BI            API/Webhook           │
-│   Email               Dashboard           ERP/CRM               │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
-```
+| 能力领域 | 工具 | 状态 |
+|----------|------|------|
+| ☁️ 云基础设施 | Azure, M365 | ✅ |
+| ⚙️ 自动化编排 | PowerShell, Bash, Ansible, CI/CD | ✅ |
+| 💬 协作通信 | Teams, SharePoint, VoIP | ✅ |
+| 🤖 AI 处理 | Azure OpenAI, Semantic Kernel | ✅ |
+| 📊 数据分析 | Power BI, Fabric | ✅ |
 
 ---
 
-## 📦 核心组件 & 开源资源
+## ☁️ 1. 云基础设施 (Azure + M365)
 
-### 1️⃣ 数据采集层
+### Azure 基础设施即代码 (IaC)
 
-| 场景 | 工具 | 开源资源 |
+| 工具 | 用途 | 开源资源 |
 |------|------|----------|
-| 表单收集 | Power Apps | https://github.com/pnp/powerapps-samples |
-| 文档管理 | SharePoint | https://github.com/pnp/sp-dev-fx-webparts |
-| Excel 数据 | Office Scripts | https://github.com/OfficeDev/office-scripts-docs |
+| **Bicep** | Azure 原生 IaC | https://github.com/Azure/bicep |
+| **Terraform** | 多云 IaC | https://github.com/hashicorp/terraform-provider-azurerm |
+| **Azure CLI** | 命令行管理 | https://github.com/Azure/azure-cli |
+| **ALZ (Landing Zone)** | 企业级架构 | https://github.com/Azure/ALZ-Bicep |
 
-**快速开始 - Power Apps 表单:**
-```
-1. 打开 make.powerapps.com
-2. 创建 → 从 Dataverse 表
-3. 自动生成 CRUD 应用
-```
+**Bicep 部署示例:**
+```bicep
+// main.bicep - 部署 Web App + SQL
+param location string = 'switzerlandnorth'
 
-### 2️⃣ 存储分析层
+resource appServicePlan 'Microsoft.Web/serverfarms@2022-03-01' = {
+  name: 'asp-prod'
+  location: location
+  sku: { name: 'B1' }
+}
 
-| 场景 | 工具 | 开源资源 |
-|------|------|----------|
-| 结构化数据 | Dataverse | https://github.com/microsoft/PowerApps-Samples |
-| 文档存储 | SharePoint | https://github.com/pnp/pnpcore |
-| 大数据分析 | Fabric | https://github.com/microsoft/fabric-samples |
-
-**Dataverse 表设计示例:**
-```
-客户表 (Account)
-├── 客户名称 (Text)
-├── 联系邮箱 (Email)
-├── 客户等级 (Choice: A/B/C)
-├── 创建日期 (DateTime)
-└── 关联订单 (Lookup → Order)
-```
-
-### 3️⃣ AI 处理层
-
-| 场景 | 工具 | 开源资源 |
-|------|------|----------|
-| 企业 RAG | Azure OpenAI | https://github.com/Azure-Samples/azure-search-openai-demo |
-| AI 编排 | Semantic Kernel | https://github.com/microsoft/semantic-kernel |
-| 低代码 AI | Copilot Studio | https://github.com/microsoft/CopilotStudioSamples |
-| 多 Agent | AutoGen | https://github.com/microsoft/autogen |
-
-**Semantic Kernel 快速开始:**
-```python
-# pip install semantic-kernel
-from semantic_kernel import Kernel
-from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
-
-kernel = Kernel()
-kernel.add_service(AzureChatCompletion(
-    deployment_name="gpt-4",
-    endpoint="https://your-resource.openai.azure.com/",
-    api_key="your-key"
-))
-
-# 调用
-result = await kernel.invoke_prompt("总结这段文字: {{$input}}")
-```
-
-### 4️⃣ 自动化层 (Power Automate)
-
-| 场景 | 模板 | 开源资源 |
-|------|------|----------|
-| 审批流程 | 请假/报销审批 | https://github.com/pnp/powerautomate-samples |
-| 数据同步 | SharePoint ↔ SQL | https://github.com/pnp/powerplatform-samples |
-| AI 触发 | 邮件分类自动回复 | 内置 AI Builder |
-
-**常用 Power Automate 流程:**
-```
-📧 新邮件到达
-    ↓
-🤖 AI Builder 分类 (询价/投诉/咨询)
-    ↓
-📝 创建 Dataverse 记录
-    ↓
-👤 分配给对应团队
-    ↓
-📱 Teams 通知
-```
-
-### 5️⃣ 展示层
-
-| 场景 | 工具 | 开源资源 |
-|------|------|----------|
-| 数据报表 | Power BI | https://github.com/microsoft/powerbi-desktop-samples |
-| 团队协作 | Teams Tab | https://github.com/OfficeDev/Microsoft-Teams-Samples |
-| 门户网站 | Power Pages | https://github.com/microsoft/PowerApps-Samples |
-
----
-
-## 🎯 典型业务场景
-
-### 场景 1: 客户服务自动化
-
-```
-客户提交表单 (Power Apps)
-       ↓
-存入 Dataverse
-       ↓
-Power Automate 触发
-       ↓
-AI 分析意图 (Azure OpenAI)
-       ↓
-├─ 简单问题 → 自动回复
-├─ 复杂问题 → 创建工单 + 通知客服
-└─ 投诉 → 升级主管 + Teams 提醒
-       ↓
-Power BI 统计分析
-```
-
-### 场景 2: 文档智能处理
-
-```
-上传文档 (SharePoint)
-       ↓
-Power Automate 触发
-       ↓
-AI 提取关键信息 (Azure AI Document Intelligence)
-       ↓
-存入 Dataverse
-       ↓
-RAG 知识库更新 (Azure AI Search)
-       ↓
-Copilot 可查询
-```
-
-### 场景 3: 销售数据分析
-
-```
-销售录入 (Power Apps / Excel)
-       ↓
-Dataverse / Fabric
-       ↓
-Power BI 实时报表
-       ↓
-AI 预测 (Azure ML)
-       ↓
-异常预警 → Teams 通知
-```
-
----
-
-## 🛠️ 快速部署清单
-
-### M365 自动化 (PnP PowerShell)
-
-```powershell
-# 安装
-Install-Module PnP.PowerShell -Scope CurrentUser
-
-# 连接
-Connect-PnPOnline -Url https://contoso.sharepoint.com -Interactive
-
-# 创建列表
-New-PnPList -Title "客户反馈" -Template GenericList
-
-# 添加字段
-Add-PnPField -List "客户反馈" -DisplayName "客户名称" -InternalName "CustomerName" -Type Text
-Add-PnPField -List "客户反馈" -DisplayName "反馈类型" -InternalName "FeedbackType" -Type Choice -Choices "咨询","投诉","建议"
-Add-PnPField -List "客户反馈" -DisplayName "处理状态" -InternalName "Status" -Type Choice -Choices "待处理","处理中","已完成"
-```
-
-### CLI for M365
-
-```bash
-# 安装
-npm install -g @pnp/cli-microsoft365
-
-# 登录
-m365 login
-
-# 创建 Teams 团队
-m365 teams team add --name "客户服务" --description "客户服务团队"
-
-# 添加频道
-m365 teams channel add --teamName "客户服务" --name "紧急工单"
-```
-
-### Azure OpenAI + Semantic Kernel
-
-```python
-# requirements.txt
-semantic-kernel>=1.0.0
-azure-identity
-
-# app.py
-import asyncio
-from semantic_kernel import Kernel
-from semantic_kernel.connectors.ai.open_ai import AzureChatCompletion
-
-async def main():
-    kernel = Kernel()
-    kernel.add_service(AzureChatCompletion(
-        deployment_name="gpt-4",
-        endpoint="https://your.openai.azure.com/",
-        api_key="your-key"
-    ))
-    
-    # 客户意图分类
-    prompt = """
-    分析以下客户消息的意图，返回: 咨询/投诉/建议
-    
-    消息: {{$input}}
-    意图:
-    """
-    
-    result = await kernel.invoke_prompt(prompt, input="你们的产品质量太差了！")
-    print(result)  # 输出: 投诉
-
-asyncio.run(main())
-```
-
----
-
-## 📊 完整闭环示例代码
-
-### Power Automate HTTP 触发 → AI 处理 → Teams 通知
-
-```json
-{
-  "trigger": "HTTP Request",
-  "actions": [
-    {
-      "name": "调用 Azure OpenAI",
-      "type": "HTTP",
-      "method": "POST",
-      "uri": "https://your.openai.azure.com/openai/deployments/gpt-4/chat/completions?api-version=2024-02-01",
-      "headers": {
-        "api-key": "@{variables('OpenAI_Key')}"
-      },
-      "body": {
-        "messages": [
-          {"role": "system", "content": "分类客户意图"},
-          {"role": "user", "content": "@{triggerBody()['message']}"}
-        ]
-      }
-    },
-    {
-      "name": "发送 Teams 消息",
-      "type": "Teams_PostMessage",
-      "channel": "客户服务/紧急工单",
-      "message": "新工单: @{triggerBody()['customer']}\n意图: @{body('调用_Azure_OpenAI')['choices'][0]['message']['content']}"
-    }
-  ]
+resource webApp 'Microsoft.Web/sites@2022-03-01' = {
+  name: 'app-prod-001'
+  location: location
+  properties: {
+    serverFarmId: appServicePlan.id
+  }
 }
 ```
+
+```bash
+# 部署
+az deployment group create -g rg-prod --template-file main.bicep
+```
+
+### Azure 监控与安全
+
+| 工具 | 用途 | 开源资源 |
+|------|------|----------|
+| **Azure Monitor** | 监控告警 | https://github.com/Azure/azure-monitor-baseline-alerts |
+| **Log Analytics** | 日志分析 | KQL 查询语言 |
+| **Microsoft Sentinel** | SIEM 安全 | https://github.com/Azure/Azure-Sentinel |
+| **Defender for Cloud** | 云安全态势 | 内置 |
+
+**监控告警 Bicep:**
+```bicep
+resource alert 'Microsoft.Insights/metricAlerts@2018-03-01' = {
+  name: 'cpu-alert'
+  location: 'global'
+  properties: {
+    severity: 2
+    enabled: true
+    scopes: [webApp.id]
+    evaluationFrequency: 'PT5M'
+    windowSize: 'PT15M'
+    criteria: {
+      'odata.type': 'Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria'
+      allOf: [{
+        name: 'HighCPU'
+        metricName: 'CpuPercentage'
+        operator: 'GreaterThan'
+        threshold: 80
+        timeAggregation: 'Average'
+      }]
+    }
+    actions: [{ actionGroupId: actionGroup.id }]
+  }
+}
+```
+
+### M365 管理
+
+| 工具 | 用途 | 开源资源 |
+|------|------|----------|
+| **Microsoft 365 Admin** | 租户管理 | Portal |
+| **Entra ID (Azure AD)** | 身份管理 | https://github.com/AzureAD/microsoft-authentication-library-for-js |
+| **Intune** | 设备管理 | https://github.com/microsoftgraph/powershell-intune-samples |
+| **Exchange Online** | 邮件管理 | PowerShell |
+
+**M365 用户批量创建:**
+```powershell
+# 从 CSV 批量创建用户
+Import-Csv users.csv | ForEach-Object {
+    New-MgUser -DisplayName $_.Name `
+               -UserPrincipalName $_.UPN `
+               -MailNickname $_.Alias `
+               -AccountEnabled $true `
+               -PasswordProfile @{
+                   Password = $_.Password
+                   ForceChangePasswordNextSignIn = $true
+               }
+}
+```
+
+---
+
+## ⚙️ 2. 自动化与编排
+
+### PowerShell 自动化
+
+| 模块 | 用途 | 开源资源 |
+|------|------|----------|
+| **Az Module** | Azure 管理 | https://github.com/Azure/azure-powershell |
+| **PnP.PowerShell** | M365/SharePoint | https://github.com/pnp/powershell |
+| **Microsoft.Graph** | Graph API | https://github.com/microsoftgraph/msgraph-sdk-powershell |
+| **ExchangeOnline** | 邮件管理 | 内置 |
+
+**Azure 资源批量管理:**
+```powershell
+# 安装模块
+Install-Module Az -Scope CurrentUser
+
+# 登录
+Connect-AzAccount
+
+# 批量停止非生产 VM (节省成本)
+Get-AzVM -ResourceGroupName "rg-dev" | 
+    Where-Object { $_.Tags["Environment"] -eq "Dev" } |
+    Stop-AzVM -Force
+
+# 导出所有资源清单
+Get-AzResource | 
+    Select-Object Name, ResourceType, Location, ResourceGroupName |
+    Export-Csv -Path "azure-inventory.csv"
+```
+
+### Bash 脚本
+
+```bash
+#!/bin/bash
+# azure-deploy.sh - Azure 资源部署脚本
+
+set -e
+
+RESOURCE_GROUP="rg-prod"
+LOCATION="switzerlandnorth"
+
+# 登录 (CI/CD 中使用 Service Principal)
+az login --service-principal -u $ARM_CLIENT_ID -p $ARM_CLIENT_SECRET --tenant $ARM_TENANT_ID
+
+# 创建资源组
+az group create --name $RESOURCE_GROUP --location $LOCATION
+
+# 部署 Bicep
+az deployment group create \
+    --resource-group $RESOURCE_GROUP \
+    --template-file main.bicep \
+    --parameters @params.json
+
+# 验证部署
+az webapp show --name app-prod-001 --resource-group $RESOURCE_GROUP --query state
+
+echo "✅ Deployment completed"
+```
+
+### Ansible AWX
+
+| 资源 | 链接 |
+|------|------|
+| **AWX (开源 Tower)** | https://github.com/ansible/awx |
+| **Azure Collection** | https://github.com/ansible-collections/azure |
+| **Windows Collection** | https://github.com/ansible-collections/ansible.windows |
+
+**Ansible Playbook - Azure VM:**
+```yaml
+# deploy-vm.yml
+---
+- name: Deploy Azure VM
+  hosts: localhost
+  connection: local
+  collections:
+    - azure.azcollection
+
+  tasks:
+    - name: Create resource group
+      azure_rm_resourcegroup:
+        name: rg-ansible
+        location: switzerlandnorth
+
+    - name: Create virtual network
+      azure_rm_virtualnetwork:
+        resource_group: rg-ansible
+        name: vnet-prod
+        address_prefixes: "10.0.0.0/16"
+
+    - name: Create VM
+      azure_rm_virtualmachine:
+        resource_group: rg-ansible
+        name: vm-web-01
+        vm_size: Standard_B2s
+        admin_username: azureuser
+        ssh_password_enabled: false
+        ssh_public_keys:
+          - path: /home/azureuser/.ssh/authorized_keys
+            key_data: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+        image:
+          offer: 0001-com-ubuntu-server-jammy
+          publisher: Canonical
+          sku: 22_04-lts
+          version: latest
+```
+
+**AWX 安装 (Docker):**
+```bash
+git clone https://github.com/ansible/awx.git
+cd awx
+make docker-compose-build
+docker-compose up -d
+# 访问: http://localhost:8052
+```
+
+### CI/CD 流水线
+
+#### GitHub Actions
+
+```yaml
+# .github/workflows/azure-deploy.yml
+name: Azure Deployment
+
+on:
+  push:
+    branches: [main]
+
+env:
+  AZURE_LOCATION: switzerlandnorth
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      
+      - name: Deploy Bicep
+        uses: azure/arm-deploy@v1
+        with:
+          resourceGroupName: rg-prod
+          template: ./infra/main.bicep
+          
+      - name: Run Ansible
+        run: |
+          pip install ansible azure-cli
+          ansible-playbook deploy.yml
+```
+
+#### Azure DevOps Pipeline
+
+```yaml
+# azure-pipelines.yml
+trigger:
+  - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+  - stage: Build
+    jobs:
+      - job: Validate
+        steps:
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: 'Azure-Connection'
+              scriptType: 'bash'
+              scriptLocation: 'inlineScript'
+              inlineScript: |
+                az bicep build --file main.bicep
+
+  - stage: Deploy
+    jobs:
+      - deployment: Production
+        environment: 'production'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: AzureResourceManagerTemplateDeployment@3
+                  inputs:
+                    deploymentScope: 'Resource Group'
+                    azureResourceManagerConnection: 'Azure-Connection'
+                    resourceGroupName: 'rg-prod'
+                    location: 'Switzerland North'
+                    templateLocation: 'Linked artifact'
+                    csmFile: '$(Pipeline.Workspace)/main.bicep'
+```
+
+#### Jenkins Pipeline
+
+```groovy
+// Jenkinsfile
+pipeline {
+    agent any
+    
+    environment {
+        AZURE_CREDENTIALS = credentials('azure-service-principal')
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/your-org/infra.git'
+            }
+        }
+        
+        stage('Validate') {
+            steps {
+                sh 'az bicep build --file main.bicep'
+            }
+        }
+        
+        stage('Deploy') {
+            steps {
+                withCredentials([azureServicePrincipal('azure-service-principal')]) {
+                    sh '''
+                        az login --service-principal \
+                            -u $AZURE_CLIENT_ID \
+                            -p $AZURE_CLIENT_SECRET \
+                            --tenant $AZURE_TENANT_ID
+                        
+                        az deployment group create \
+                            --resource-group rg-prod \
+                            --template-file main.bicep
+                    '''
+                }
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                sh 'ansible-playbook test-deployment.yml'
+            }
+        }
+    }
+    
+    post {
+        success {
+            slackSend channel: '#deployments', message: "✅ Deployment successful"
+        }
+        failure {
+            slackSend channel: '#deployments', message: "❌ Deployment failed"
+        }
+    }
+}
+```
+
+---
+
+## 💬 3. 协作通信 (Teams, SharePoint, VoIP)
+
+### Microsoft Teams
+
+| 功能 | 工具 | 开源资源 |
+|------|------|----------|
+| **Teams 管理** | PowerShell | https://github.com/MicrosoftDocs/office-docs-powershell |
+| **Teams Apps** | Teams Toolkit | https://github.com/OfficeDev/Microsoft-Teams-Samples |
+| **Teams Bot** | Bot Framework | https://github.com/microsoft/botframework-sdk |
+| **Webhooks** | Incoming Webhook | 内置 |
+
+**Teams 自动化管理:**
+```powershell
+# 安装 Teams 模块
+Install-Module MicrosoftTeams
+
+# 连接
+Connect-MicrosoftTeams
+
+# 批量创建团队
+$teams = @(
+    @{Name="项目A"; Description="项目A团队"; Visibility="Private"},
+    @{Name="项目B"; Description="项目B团队"; Visibility="Private"}
+)
+
+$teams | ForEach-Object {
+    New-Team -DisplayName $_.Name -Description $_.Description -Visibility $_.Visibility
+}
+
+# 添加频道
+New-TeamChannel -GroupId $teamId -DisplayName "开发" -Description "开发讨论"
+New-TeamChannel -GroupId $teamId -DisplayName "测试" -Description "测试反馈"
+```
+
+**Teams Webhook 通知:**
+```bash
+#!/bin/bash
+# 发送部署通知到 Teams
+
+WEBHOOK_URL="https://outlook.office.com/webhook/xxx"
+
+curl -H "Content-Type: application/json" -d '{
+    "@type": "MessageCard",
+    "themeColor": "0076D7",
+    "summary": "部署通知",
+    "sections": [{
+        "activityTitle": "✅ 生产环境部署成功",
+        "facts": [
+            {"name": "环境", "value": "Production"},
+            {"name": "版本", "value": "v1.2.3"},
+            {"name": "时间", "value": "'$(date)'"}
+        ]
+    }]
+}' $WEBHOOK_URL
+```
+
+### SharePoint
+
+| 功能 | 工具 | 开源资源 |
+|------|------|----------|
+| **站点管理** | PnP PowerShell | https://github.com/pnp/powershell |
+| **SPFx 开发** | SharePoint Framework | https://github.com/pnp/sp-dev-fx-webparts |
+| **迁移工具** | SharePoint Migration | https://github.com/pnp/PnP-Tools |
+
+**SharePoint 站点批量创建:**
+```powershell
+# 批量创建项目站点
+$sites = @(
+    @{Url="sites/ProjectA"; Title="项目A"; Template="STS#3"},
+    @{Url="sites/ProjectB"; Title="项目B"; Template="STS#3"}
+)
+
+$sites | ForEach-Object {
+    New-PnPSite -Type TeamSite `
+        -Title $_.Title `
+        -Alias ($_.Url -replace "sites/","") `
+        -Description "项目协作站点"
+}
+```
+
+### VoIP / Teams Phone
+
+| 功能 | 工具 | 说明 |
+|------|------|------|
+| **Teams Phone** | Teams Admin | 企业电话系统 |
+| **Direct Routing** | SBC | 连接 PSTN |
+| **Auto Attendant** | Teams Admin | 自动话务员 |
+| **Call Queue** | Teams Admin | 呼叫队列 |
+
+**Teams Phone 配置 (PowerShell):**
+```powershell
+# 分配电话号码
+Set-CsPhoneNumberAssignment -Identity user@contoso.com `
+    -PhoneNumber "+41441234567" `
+    -PhoneNumberType DirectRouting
+
+# 创建呼叫队列
+New-CsCallQueue -Name "客服热线" `
+    -LanguageId "zh-CN" `
+    -UseDefaultMusicOnHold $true `
+    -RoutingMethod Attendant `
+    -Users @("agent1@contoso.com", "agent2@contoso.com")
+
+# 创建自动话务员
+New-CsAutoAttendant -Name "总机" `
+    -LanguageId "zh-CN" `
+    -TimeZoneId "W. Europe Standard Time" `
+    -DefaultCallFlow $defaultCallFlow
+```
+
+**SIP Trunk 配置 (Direct Routing):**
+```powershell
+# 添加 SBC
+New-CsOnlinePSTNGateway -Identity "sbc.contoso.com" `
+    -SipSignalingPort 5067 `
+    -Enabled $true
+
+# 创建语音路由
+New-CsOnlineVoiceRoute -Identity "Swiss-Route" `
+    -NumberPattern "^\+41(\d{9})$" `
+    -OnlinePstnGatewayList "sbc.contoso.com" `
+    -Priority 1
+```
+
+---
+
+## 🔄 4. 完整自动化闭环
+
+### 场景: 新员工入职自动化
+
+```
+HR 提交入职表单 (Power Apps)
+         ↓
+Power Automate 触发
+         ↓
+┌────────┴────────┐
+│                 │
+▼                 ▼
+Entra ID          M365
+创建用户          分配许可证
+         │
+         ▼
+    PowerShell 脚本
+    ├─ 创建邮箱
+    ├─ 加入 Teams 团队
+    ├─ 分配 SharePoint 权限
+    └─ 配置 Teams Phone
+         │
+         ▼
+    Ansible Playbook
+    ├─ 配置 VPN 账号
+    └─ 创建 AD 账号 (混合环境)
+         │
+         ▼
+    通知 (Teams + Email)
+    └─ 发送欢迎邮件 + 入职指南
+```
+
+**完整 PowerShell 脚本:**
+```powershell
+# onboard-user.ps1
+param(
+    [string]$DisplayName,
+    [string]$Email,
+    [string]$Department,
+    [string]$PhoneNumber
+)
+
+# 1. 创建 Entra ID 用户
+$password = [System.Web.Security.Membership]::GeneratePassword(16, 4)
+$user = New-MgUser -DisplayName $DisplayName `
+    -UserPrincipalName $Email `
+    -MailNickname ($Email -split "@")[0] `
+    -Department $Department `
+    -AccountEnabled $true `
+    -PasswordProfile @{
+        Password = $password
+        ForceChangePasswordNextSignIn = $true
+    }
+
+# 2. 分配 M365 许可证
+Set-MgUserLicense -UserId $user.Id -AddLicenses @{SkuId = "M365_E3_SKU_ID"} -RemoveLicenses @()
+
+# 3. 添加到 Teams 团队
+Add-TeamUser -GroupId $departmentTeamId -User $Email -Role Member
+
+# 4. 分配 Teams Phone
+Set-CsPhoneNumberAssignment -Identity $Email -PhoneNumber $PhoneNumber -PhoneNumberType DirectRouting
+
+# 5. 发送欢迎邮件
+$mailParams = @{
+    Message = @{
+        Subject = "欢迎加入公司"
+        Body = @{
+            ContentType = "HTML"
+            Content = "<h1>欢迎 $DisplayName!</h1><p>您的临时密码: $password</p>"
+        }
+        ToRecipients = @(@{EmailAddress = @{Address = $Email}})
+    }
+}
+Send-MgUserMail -UserId "hr@contoso.com" -BodyParameter $mailParams
+
+# 6. Teams 通知
+$webhook = "https://outlook.office.com/webhook/xxx"
+Invoke-RestMethod -Uri $webhook -Method Post -Body (@{
+    text = "✅ 新员工 $DisplayName 入职完成"
+} | ConvertTo-Json) -ContentType "application/json"
+
+Write-Host "✅ 用户 $DisplayName 创建完成"
+```
+
+---
+
+## 📊 能力对照表
+
+| 要求 | 工具 | 本项目覆盖 |
+|------|------|-----------|
+| M365 搭建运维 | Entra ID, Exchange, Intune | ✅ |
+| Azure 云基础设施 | Bicep, Terraform, ARM | ✅ |
+| PowerShell 自动化 | Az, PnP, Graph, Teams | ✅ |
+| Bash 脚本 | Azure CLI, Shell | ✅ |
+| Jenkins CI/CD | Jenkinsfile, Pipeline | ✅ |
+| Ansible AWX | Playbooks, Azure Collection | ✅ |
+| CI/CD 流水线 | GitHub Actions, Azure DevOps | ✅ |
+| Teams 协作 | 管理, Bot, Webhook | ✅ |
+| SharePoint | PnP, SPFx | ✅ |
+| VoIP 电话 | Teams Phone, Direct Routing | ✅ |
 
 ---
 
@@ -289,20 +602,19 @@ asyncio.run(main())
 
 | 类别 | 链接 |
 |------|------|
-| **Power Platform 示例** | https://github.com/pnp/powerplatform-samples |
-| **Power Automate 模板** | https://github.com/pnp/powerautomate-samples |
-| **Power Apps 示例** | https://github.com/pnp/powerapps-samples |
-| **SharePoint 开发** | https://github.com/pnp/sp-dev-fx-webparts |
-| **Teams 开发** | https://github.com/OfficeDev/Microsoft-Teams-Samples |
-| **Semantic Kernel** | https://github.com/microsoft/semantic-kernel |
-| **Copilot Studio** | https://github.com/microsoft/CopilotStudioSamples |
-| **Azure RAG** | https://github.com/Azure-Samples/azure-search-openai-demo |
-
----
-
-## 📚 学习路径
-
-1. **基础**: Power Platform 基础 → M365 管理
-2. **进阶**: Power Automate 高级 → Dataverse 建模
-3. **AI**: Azure OpenAI → Semantic Kernel → Copilot Studio
-4. **集成**: API 开发 → 企业集成
+| **Azure IaC** | |
+| Bicep | https://github.com/Azure/bicep |
+| ALZ Landing Zone | https://github.com/Azure/ALZ-Bicep |
+| Terraform Azure | https://github.com/hashicorp/terraform-provider-azurerm |
+| **自动化** | |
+| Az PowerShell | https://github.com/Azure/azure-powershell |
+| PnP PowerShell | https://github.com/pnp/powershell |
+| Ansible AWX | https://github.com/ansible/awx |
+| Ansible Azure | https://github.com/ansible-collections/azure |
+| **M365** | |
+| Graph SDK | https://github.com/microsoftgraph/msgraph-sdk-powershell |
+| Teams Samples | https://github.com/OfficeDev/Microsoft-Teams-Samples |
+| SPFx Samples | https://github.com/pnp/sp-dev-fx-webparts |
+| **监控安全** | |
+| Azure Sentinel | https://github.com/Azure/Azure-Sentinel |
+| Monitor Alerts | https://github.com/Azure/azure-monitor-baseline-alerts |
