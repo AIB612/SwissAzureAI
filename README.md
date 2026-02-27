@@ -1,38 +1,8 @@
-# 🇨🇭 Swiss-Digital-Azure-EcoAI
+# 🇨🇭 SwissAzureAI
 
-**Enterprise AI Solutions for Swiss Data Compliance**
+**Enterprise AI & Digital Transformation with Microsoft Ecosystem**
 
-> By SherryAGI | Azure RAG + Swiss Data Residency + FADP/GDPR Compliance
-
----
-
-## 🎯 Based on Microsoft Official Project
-
-### azure-search-openai-demo
-
-**GitHub:** https://github.com/Azure-Samples/azure-search-openai-demo
-
-Microsoft 官方 RAG 示例，支持 Switzerland North 部署。
-
-```bash
-# Clone
-git clone https://github.com/Azure-Samples/azure-search-openai-demo
-cd azure-search-openai-demo
-
-# Deploy to Switzerland North
-azd auth login
-azd env new swiss-rag
-azd env set AZURE_LOCATION switzerlandnorth
-azd env set AZURE_OPENAI_LOCATION switzerlandnorth
-azd up
-```
-
-**Features:**
-- ✅ Chat interface with citations
-- ✅ Document ingestion (PDF, DOCX, etc.)
-- ✅ Azure AI Search + Azure OpenAI
-- ✅ Python/Java/.NET/JavaScript versions
-- ✅ Enterprise-ready architecture
+> By SherryAGI | Azure + M365 + Swiss Compliance
 
 ---
 
@@ -40,21 +10,20 @@ azd up
 
 ```
 SwissAzureAI/
-├── 01-azure-rag/              # Azure deployment (based on MS demo)
-│   ├── infra/main.bicep       # Infrastructure as Code
-│   └── app/main.py            # FastAPI application
-├── 02-pgvector-private/       # Self-hosted alternative
-│   ├── docker/                # Docker Compose stack
-│   └── app/                   # Private RAG app
-├── 03-compliance/             # FADP, FINMA checklists
-└── 04-automation/             # Terraform, CI/CD
+├── 00-microsoft-ecosystem/  # 微软开源项目合集
+├── 01-azure-rag/            # Azure RAG 实现
+├── 02-pgvector-private/     # 私有部署 (银行/FINMA)
+├── 03-compliance/           # FADP, FINMA 检查清单
+└── 04-automation/           # Terraform, CI/CD
 ```
 
 ---
 
-## 🚀 Quick Start
+## 🎯 Core Reference
 
-### Option 1: Use Microsoft Demo Directly
+### Azure RAG Demo (Microsoft Official)
+
+**GitHub:** https://github.com/Azure-Samples/azure-search-openai-demo
 
 ```bash
 git clone https://github.com/Azure-Samples/azure-search-openai-demo
@@ -63,16 +32,39 @@ azd env set AZURE_LOCATION switzerlandnorth
 azd up
 ```
 
-### Option 2: Use This Repo's Templates
+---
 
+## 🏢 Microsoft Ecosystem Highlights
+
+| Category | Key Projects |
+|----------|--------------|
+| **AI** | [semantic-kernel](https://github.com/microsoft/semantic-kernel), [autogen](https://github.com/microsoft/autogen) |
+| **M365** | [PnP PowerShell](https://github.com/pnp/powershell), [CLI for M365](https://github.com/pnp/cli-microsoft365) |
+| **DevOps** | [Bicep](https://github.com/Azure/bicep), [ALZ](https://github.com/Azure/ALZ-Bicep) |
+| **Data** | [Fabric Samples](https://github.com/microsoft/fabric-samples), [SynapseML](https://github.com/microsoft/SynapseML) |
+
+👉 See [00-microsoft-ecosystem/README.md](./00-microsoft-ecosystem/README.md) for full list
+
+---
+
+## 🚀 Quick Start
+
+### Azure RAG
 ```bash
-# Azure (Bicep)
 cd 01-azure-rag/infra
 az deployment group create -g rg-swiss-rag --template-file main.bicep
+```
 
-# Private (Docker)
+### Private Deployment
+```bash
 cd 02-pgvector-private/docker
 docker compose up -d
+```
+
+### M365 Automation
+```powershell
+Install-Module PnP.PowerShell
+Connect-PnPOnline -Url https://contoso.sharepoint.com -Interactive
 ```
 
 ---
@@ -84,31 +76,17 @@ docker compose up -d
 | Data Residency | Azure Switzerland North |
 | FADP | [Checklist](./03-compliance/FADP_CHECKLIST.md) |
 | FINMA | [Checklist](./03-compliance/FINMA_CHECKLIST.md) |
-| Encryption | AES-256 at rest, TLS 1.3 in transit |
 
 ---
 
-## 🔗 Microsoft Resources
+## 📚 Resources
 
-| Resource | Link |
-|----------|------|
-| Azure RAG Demo | https://github.com/Azure-Samples/azure-search-openai-demo |
-| Azure OpenAI Docs | https://learn.microsoft.com/azure/ai-services/openai/ |
-| Azure AI Search | https://learn.microsoft.com/azure/search/ |
-| Landing Zone | https://learn.microsoft.com/azure/architecture/ai-ml/architecture/azure-openai-baseline-landing-zone |
+- [Microsoft Learn](https://learn.microsoft.com)
+- [Azure Architecture Center](https://learn.microsoft.com/azure/architecture/)
+- [PnP Community](https://pnp.github.io)
 
 ---
 
 ## 📜 License
 
 MIT License - SherryAGI
-
----
-
-<div align="center">
-
-**🇨🇭 Built for Swiss Enterprise AI Compliance**
-
-Based on [azure-search-openai-demo](https://github.com/Azure-Samples/azure-search-openai-demo)
-
-</div>
