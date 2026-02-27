@@ -39,7 +39,7 @@ azd up
 ## 📁 Project Structure
 
 ```
-SwissDigitalAzureEcoAI/
+SwissAzureAI/
 ├── 01-azure-rag/              # Azure deployment (based on MS demo)
 │   ├── infra/main.bicep       # Infrastructure as Code
 │   └── app/main.py            # FastAPI application
